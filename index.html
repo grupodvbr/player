@@ -275,11 +275,10 @@ supabaseClient
 .getPublicUrl(nome);
 
 await supabaseClient
-.from("player_global")
+.from("playlist_musicas")
 .insert({
-musica:file.name,
-url:data.publicUrl,
-status:"pause"
+nome:file.name,
+url:data.publicUrl
 });
 
 alert("Música enviada!");
@@ -296,7 +295,7 @@ async function carregarPlaylist(){
 
 const { data } =
 await supabaseClient
-.from("player_global")
+.from("playlist_musicas")
 .select("*")
 .order("created_at",{ascending:true});
 
@@ -313,7 +312,7 @@ div.innerHTML += `
 
 <div class="item">
 
-<span>${m.musica}</span>
+<span>${m.nome}</span>
 
 <div class="btn-row">
 
@@ -339,24 +338,29 @@ SELECIONAR
 
 async function selecionar(index){
 
-atual = index;
+atual=index;
 
-const musica =
-musicas[index];
+const musica=musicas[index];
 
-await supabaseClient
-.from("player_global")
+const {error}=await supabaseClient
+.from("player_estado")
 .update({
 
+musica_id:musica.id,
 status:"playing",
-inicio:new Date().toISOString()
+inicio:new Date().toISOString(),
+updated_at:new Date().toISOString()
 
 })
-.eq("id",musica.id);
+.eq("id",1);
+
+if(error){
+alert(error.message);
+return;
+}
 
 document.getElementById("statusAtual")
-.innerHTML =
-"▶ Tocando: "+musica.musica;
+.innerHTML="▶ Tocando: "+musica.nome;
 
 }
 
@@ -368,18 +372,19 @@ async function playAtual(){
 
 if(!musicas.length) return;
 
-const musica =
-musicas[atual];
+const musica=musicas[atual];
 
 await supabaseClient
-.from("player_global")
+.from("player_estado")
 .update({
 
+musica_id:musica.id,
 status:"playing",
-inicio:new Date().toISOString()
+inicio:new Date().toISOString(),
+updated_at:new Date().toISOString()
 
 })
-.eq("id",musica.id);
+.eq("id",1);
 
 }
 
@@ -389,17 +394,15 @@ PAUSE
 
 async function pauseAtual(){
 
-if(!musicas.length) return;
-
-const musica =
-musicas[atual];
-
 await supabaseClient
-.from("player_global")
+.from("player_estado")
 .update({
-status:"pause"
+
+status:"pause",
+updated_at:new Date().toISOString()
+
 })
-.eq("id",musica.id);
+.eq("id",1);
 
 }
 
@@ -434,7 +437,7 @@ supabaseClient
 {
 event:"*",
 schema:"public",
-table:"player_global"
+table:"player_estado"
 },
 payload=>{
 
@@ -443,9 +446,10 @@ if(payload.new){
 document
 .getElementById("statusAtual")
 .innerHTML =
-payload.new.status === "playing"
+
+payload.new.status==="playing"
 ?
-"▶ Tocando: "+payload.new.musica
+"▶ Tocando"
 :
 "⏸ Pausado";
 
