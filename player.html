@@ -446,7 +446,9 @@ progresso.style.width = porcentagem + "%";
 }
 
 async function sincronizar(){
+if(!estadoAtual){
 modoConectando();
+}
 
 const { data, error } = await supabaseClient
 .from("player_estado")
