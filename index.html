@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Rádio Mercatto - Administrador</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+background:#0f1115;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:1400px;
+margin:auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.logo{
+font-size:28px;
+font-weight:800;
+}
+
+.card{
+background:#171a21;
+border:1px solid rgba(255,255,255,.05);
+border-radius:20px;
+padding:20px;
+margin-bottom:20px;
+}
+
+h2{
+margin-bottom:15px;
+}
+
+input[type=file]{
+width:100%;
+padding:12px;
+background:#232833;
+border-radius:12px;
+color:white;
+}
+
+.btn{
+border:none;
+cursor:pointer;
+padding:14px 22px;
+border-radius:12px;
+font-weight:700;
+transition:.2s;
+}
+
+.btn:hover{
+transform:scale(1.03);
+}
+
+.btn-primary{
+background:#00c853;
+color:white;
+}
+
+.btn-danger{
+background:#ff1744;
+color:white;
+}
+
+.btn-warning{
+background:#ff9100;
+color:white;
+}
+
+.btn-row{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.playlist{
+display:grid;
+gap:10px;
+}
+
+.item{
+background:#232833;
+padding:15px;
+border-radius:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.item span{
+font-size:14px;
+}
+
+.badge{
+background:#00c853;
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:700;
+}
+
+.status{
+font-size:16px;
+font-weight:700;
+margin-top:10px;
+}
+
+audio{
+display:none;
+}
+
+@media(max-width:900px){
+
+.item{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
+.btn-row{
+width:100%;
+}
+
+.btn{
+width:100%;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="logo">🎵 Rádio Mercatto</div>
+</div>
+
+<div class="card">
+
+<h2>Upload de Música</h2>
+
+<input type="file" id="arquivo" accept=".mp3">
+
+<br><br>
+
+<button class="btn btn-primary" onclick="uploadMusica()">
+Enviar Música
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Controle</h2>
+
+<div class="btn-row">
+
+<button class="btn btn-primary" onclick="playAtual()">
+▶ PLAY
+</button>
+
+<button class="btn btn-warning" onclick="pauseAtual()">
+⏸ PAUSE
+</button>
+
+<button class="btn btn-danger" onclick="proxima()">
+⏭ PRÓXIMA
+</button>
+
+</div>
+
+<div class="status" id="statusAtual">
+Carregando...
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Playlist</h2>
+
+<div id="playlist" class="playlist"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* ==========================
+SUPABASE
+========================== */
+
+const SUPABASE_URL = "https://dxkszikemntfusfyrzos.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NNFvdfSXgOdGGVcSbphbjQ_brC3_9ed";
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+/* ==========================
+LOAD
+========================== */
+
+let musicas = [];
+let atual = 0;
+
+window.onload = async()=>{
+
+await carregarPlaylist();
+await carregarEstado();
+
+}
+
+/* ==========================
+UPLOAD
+========================== */
+
+async function uploadMusica(){
+
+const file =
+document.getElementById("arquivo")
+.files[0];
+
+if(!file){
+alert("Selecione um MP3");
+return;
+}
+
+const nome =
+Date.now()+"_"+file.name;
+
+const { error } =
+await supabaseClient
+.storage
+.from("musicas")
+.upload(nome,file);
+
+if(error){
+alert(error.message);
+return;
+}
+
+const { data } =
+supabaseClient
+.storage
+.from("musicas")
+.getPublicUrl(nome);
+
+await supabaseClient
+.from("player_global")
+.insert({
+musica:file.name,
+url:data.publicUrl,
+status:"pause"
+});
+
+alert("Música enviada!");
+
+carregarPlaylist();
+
+}
+
+/* ==========================
+PLAYLIST
+========================== */
+
+async function carregarPlaylist(){
+
+const { data } =
+await supabaseClient
+.from("player_global")
+.select("*")
+.order("created_at",{ascending:true});
+
+musicas = data || [];
+
+const div =
+document.getElementById("playlist");
+
+div.innerHTML="";
+
+musicas.forEach((m,index)=>{
+
+div.innerHTML += `
+
+<div class="item">
+
+<span>${m.musica}</span>
+
+<div class="btn-row">
+
+<button
+class="btn btn-primary"
+onclick="selecionar(${index})">
+Selecionar
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+/* ==========================
+SELECIONAR
+========================== */
+
+async function selecionar(index){
+
+atual = index;
+
+const musica =
+musicas[index];
+
+await supabaseClient
+.from("player_global")
+.update({
+
+status:"playing",
+inicio:new Date().toISOString()
+
+})
+.eq("id",musica.id);
+
+document.getElementById("statusAtual")
+.innerHTML =
+"▶ Tocando: "+musica.musica;
+
+}
+
+/* ==========================
+PLAY
+========================== */
+
+async function playAtual(){
+
+if(!musicas.length) return;
+
+const musica =
+musicas[atual];
+
+await supabaseClient
+.from("player_global")
+.update({
+
+status:"playing",
+inicio:new Date().toISOString()
+
+})
+.eq("id",musica.id);
+
+}
+
+/* ==========================
+PAUSE
+========================== */
+
+async function pauseAtual(){
+
+if(!musicas.length) return;
+
+const musica =
+musicas[atual];
+
+await supabaseClient
+.from("player_global")
+.update({
+status:"pause"
+})
+.eq("id",musica.id);
+
+}
+
+/* ==========================
+PRÓXIMA
+========================== */
+
+async function proxima(){
+
+if(!musicas.length) return;
+
+atual++;
+
+if(atual >= musicas.length){
+atual = 0;
+}
+
+selecionar(atual);
+
+}
+
+/* ==========================
+ESTADO
+========================== */
+
+async function carregarEstado(){
+
+supabaseClient
+.channel("radio-sync")
+.on(
+"postgres_changes",
+{
+event:"*",
+schema:"public",
+table:"player_global"
+},
+payload=>{
+
+if(payload.new){
+
+document
+.getElementById("statusAtual")
+.innerHTML =
+payload.new.status === "playing"
+?
+"▶ Tocando: "+payload.new.musica
+:
+"⏸ Pausado";
+
+}
+
+}
+)
+.subscribe();
+
+}
+
+</script>
+
+</body>
+</html>
