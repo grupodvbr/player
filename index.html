@@ -1,487 +1,826 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b0d10">
-<title>OTTO MUSIC - Administrador</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0d10">
+  <title>OTTO MUSIC - Administrador</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial,sans-serif}
-:root{
---bg:#0b0d10;
---panel:#14181f;
---panel2:#1c222c;
---panel3:#242c38;
---text:#f8fafc;
---muted:#98a2b3;
---line:rgba(255,255,255,.1);
---green:#1fd47b;
---yellow:#f3c84b;
---red:#ff4d67;
---blue:#50b7ff;
---purple:#b17cff;
-}
-body{
-min-height:100vh;
-background:
-radial-gradient(circle at 18% 0,rgba(80,183,255,.18),transparent 32%),
-radial-gradient(circle at 85% 12%,rgba(31,212,123,.14),transparent 34%),
-linear-gradient(135deg,#0b0d10,#111720 54%,#08090b);
-color:var(--text);
-padding:22px;
-}
-button,input,select{font:inherit}
-.container{max-width:1500px;margin:auto}
-.topo{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:16px;
-margin-bottom:18px;
-}
-.marca{display:flex;align-items:center;gap:14px}
-.marca-selo{
-width:48px;height:48px;border-radius:16px;
-display:grid;place-items:center;
-background:linear-gradient(135deg,var(--green),var(--blue));
-color:#061014;font-weight:900;
-box-shadow:0 18px 40px rgba(31,212,123,.18);
-}
-.marca h1{font-size:28px;line-height:1;font-weight:900;letter-spacing:0}
-.marca p{color:var(--muted);font-size:14px;margin-top:5px}
-.status-global{
-display:flex;align-items:center;gap:9px;
-background:rgba(255,255,255,.06);
-border:1px solid var(--line);
-border-radius:999px;
-padding:10px 14px;
-color:var(--muted);
-font-weight:700;
-font-size:14px;
-}
-.pulso{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
-.grid{
-display:grid;
-grid-template-columns:340px minmax(0,1fr);
-gap:18px;
-align-items:start;
-}
-.card{
-background:rgba(20,24,31,.86);
-border:1px solid var(--line);
-border-radius:18px;
-box-shadow:0 18px 60px rgba(0,0,0,.28);
-overflow:hidden;
-}
-.card-head{
-padding:18px 18px 0;
-display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
-}
-.card h2{font-size:18px;margin-bottom:5px}
-.card p{color:var(--muted);font-size:13px;line-height:1.45}
-.card-body{padding:18px}
-.stack{display:grid;gap:12px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.field{display:grid;gap:7px}
-.field label{font-size:13px;color:#d7dde7;font-weight:700}
-input,select{
-width:100%;
-min-height:44px;
-border:1px solid var(--line);
-border-radius:12px;
-background:#0e1218;
-color:var(--text);
-padding:0 12px;
-outline:none;
-}
-input[type=file]{padding:10px}
-input:focus,select:focus{border-color:rgba(80,183,255,.7);box-shadow:0 0 0 3px rgba(80,183,255,.12)}
-.btn{
-min-height:44px;
-border:0;
-border-radius:12px;
-padding:0 14px;
-font-weight:800;
-cursor:pointer;
-color:#061014;
-background:#fff;
-transition:.16s ease;
-}
-.btn:hover{transform:translateY(-1px)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-primary{background:linear-gradient(135deg,var(--green),#72f2af)}
-.btn-blue{background:linear-gradient(135deg,var(--blue),#a9ddff)}
-.btn-yellow{background:linear-gradient(135deg,var(--yellow),#ffe28a)}
-.btn-danger{background:linear-gradient(135deg,var(--red),#ff8da0)}
-.btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
-.btn-small{min-height:34px;border-radius:10px;padding:0 10px;font-size:13px}
-.tabs{
-display:flex;gap:8px;flex-wrap:wrap;
-padding:10px;
-background:rgba(255,255,255,.04);
-border-bottom:1px solid var(--line);
-}
-.tab{
-border:1px solid transparent;
-background:transparent;
-color:var(--muted);
-border-radius:12px;
-padding:10px 13px;
-font-weight:800;
-cursor:pointer;
-}
-.tab.ativo{background:rgba(255,255,255,.08);color:#fff;border-color:var(--line)}
-.view{display:none}
-.view.ativa{display:block}
-.metricas{
-display:grid;
-grid-template-columns:repeat(4,minmax(0,1fr));
-gap:12px;
-margin-bottom:18px;
-}
-.metrica{
-background:rgba(255,255,255,.055);
-border:1px solid var(--line);
-border-radius:16px;
-padding:16px;
-}
-.metrica span{display:block;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
-.metrica strong{display:block;font-size:26px;margin-top:8px}
-.lista{display:grid;gap:10px;max-height:520px;overflow:auto;padding-right:4px}
-.item{
-background:var(--panel2);
-border:1px solid var(--line);
-border-radius:14px;
-padding:13px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-}
-.item-info{min-width:0}
-.item strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item small{display:block;color:var(--muted);margin-top:4px}
-.item-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.badge{
-display:inline-flex;align-items:center;gap:7px;
-border-radius:999px;
-padding:6px 9px;
-background:rgba(31,212,123,.12);
-color:#a7f3c8;
-font-size:12px;
-font-weight:800;
-}
-.builder{
-display:grid;
-grid-template-columns:minmax(280px,420px) minmax(0,1fr);
-gap:18px;
-}
-.musicas-grid{display:grid;gap:8px;max-height:560px;overflow:auto;padding-right:4px}
-.music-row{
-display:grid;
-grid-template-columns:minmax(0,1fr) auto;
-gap:10px;align-items:center;
-padding:11px;
-border-radius:12px;
-background:#10151c;
-border:1px solid var(--line);
-}
-.music-row strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.music-row small{color:var(--muted)}
-.playlist-itens{display:grid;gap:8px}
-.ordem-item{
-display:grid;
-grid-template-columns:36px minmax(0,1fr) auto;
-gap:10px;
-align-items:center;
-padding:12px;
-border-radius:13px;
-background:#10151c;
-border:1px solid var(--line);
-}
-.numero{
-width:32px;height:32px;border-radius:10px;
-display:grid;place-items:center;
-background:rgba(80,183,255,.12);
-color:#bce5ff;
-font-weight:900;
-}
-.timeline{
-margin-top:14px;
-background:#0d1117;
-border:1px solid var(--line);
-border-radius:16px;
-padding:14px;
-overflow:auto;
-}
-.linha{
-display:flex;
-height:58px;
-min-width:680px;
-border-radius:14px;
-overflow:hidden;
-border:1px solid rgba(255,255,255,.08);
-}
-.segmento{
-position:relative;
-min-width:72px;
-display:flex;
-align-items:center;
-padding:0 10px;
-background:linear-gradient(135deg,rgba(80,183,255,.84),rgba(31,212,123,.78));
-border-right:1px solid rgba(0,0,0,.2);
-}
-.segmento:nth-child(2n){background:linear-gradient(135deg,rgba(243,200,75,.86),rgba(255,77,103,.74))}
-.segmento span{
-font-size:12px;
-font-weight:900;
-color:#061014;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
-.marcadores{
-min-width:680px;
-display:flex;
-justify-content:space-between;
-color:var(--muted);
-font-size:12px;
-font-weight:700;
-margin-top:8px;
-}
-.andamento{
-margin-top:12px;
-display:grid;
-gap:8px;
-}
-.barra{
-height:10px;
-border-radius:999px;
-background:rgba(255,255,255,.09);
-overflow:hidden;
-}
-.progresso{height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:999px}
-.toast{
-position:fixed;
-right:18px;
-bottom:18px;
-z-index:20;
-max-width:420px;
-background:#10151c;
-border:1px solid var(--line);
-border-radius:14px;
-box-shadow:0 18px 50px rgba(0,0,0,.35);
-padding:14px 16px;
-display:none;
-}
-.toast.ativo{display:block}
-.toast strong{display:block;margin-bottom:3px}
-.toast p{color:var(--muted);font-size:13px}
-.vazio{
-border:1px dashed rgba(255,255,255,.18);
-border-radius:14px;
-padding:18px;
-color:var(--muted);
-text-align:center;
-}
-@media(max-width:1050px){
-.grid,.builder{grid-template-columns:1fr}
-.metricas{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:650px){
-body{padding:12px}
-.topo{align-items:flex-start;flex-direction:column}
-.metricas{grid-template-columns:1fr}
-.item,.ordem-item{grid-template-columns:1fr}
-.item-actions{justify-content:flex-start}
-.btn{width:100%}
-}
-</style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Inter, Arial, sans-serif
+    }
+
+    :root {
+      --bg: #0b0d10;
+      --panel: #14181f;
+      --panel2: #1c222c;
+      --panel3: #242c38;
+      --text: #f8fafc;
+      --muted: #98a2b3;
+      --line: rgba(255, 255, 255, .1);
+      --green: #1fd47b;
+      --yellow: #f3c84b;
+      --red: #ff4d67;
+      --blue: #50b7ff;
+      --purple: #b17cff;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 0, rgba(80, 183, 255, .18), transparent 32%),
+        radial-gradient(circle at 85% 12%, rgba(31, 212, 123, .14), transparent 34%),
+        linear-gradient(135deg, #0b0d10, #111720 54%, #08090b);
+      color: var(--text);
+      padding: 8px;
+    }
+
+
+
+    button,
+    input,
+    select {
+      font: inherit
+    }
+
+    .container {
+      width: 100%;
+      height: calc(100vh - 16px);
+      max-width: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+
+
+    .topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .marca {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .marca-selo {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      color: #061014;
+      font-weight: 900;
+      box-shadow: 0 18px 40px rgba(31, 212, 123, .18);
+    }
+
+    .marca h1 {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0
+    }
+
+    .marca p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 5px
+    }
+
+    .status-global {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .pulso {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green)
+    }
+
+    .grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .card {
+      background: rgba(20, 24, 31, .86);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .28);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 18px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 5px
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45
+    }
+
+    .card-body {
+      padding: 18px
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .field {
+      display: grid;
+      gap: 7px
+    }
+
+    .field label {
+      font-size: 13px;
+      color: #d7dde7;
+      font-weight: 700
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #0e1218;
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    input[type=file] {
+      padding: 10px
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(80, 183, 255, .7);
+      box-shadow: 0 0 0 3px rgba(80, 183, 255, .12)
+    }
+
+    .btn {
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #061014;
+      background: #fff;
+      transition: .16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px)
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--green), #72f2af)
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, var(--blue), #a9ddff)
+    }
+
+    .btn-yellow {
+      background: linear-gradient(135deg, var(--yellow), #ffe28a)
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--red), #ff8da0)
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, .07);
+      color: var(--text);
+      border: 1px solid var(--line)
+    }
+
+    .btn-small {
+      min-height: 34px;
+      border-radius: 10px;
+      padding: 0 10px;
+      font-size: 13px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px;
+      background: rgba(255, 255, 255, .04);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tab {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 10px 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab.ativo {
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      border-color: var(--line)
+    }
+
+    .view {
+      display: none
+    }
+
+    .view.ativa {
+      display: block
+    }
+
+    .metricas {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metrica {
+      background: rgba(255, 255, 255, .055);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .metrica span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em
+    }
+
+    .metrica strong {
+      display: block;
+      font-size: 26px;
+      margin-top: 8px
+    }
+
+    .lista {
+      display: grid;
+      gap: 10px;
+      max-height: 520px;
+      overflow: auto;
+      padding-right: 4px
+    }
+
+    .item {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .item-info {
+      min-width: 0
+    }
+
+    .item strong {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .item small {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      padding: 6px 9px;
+      background: rgba(31, 212, 123, .12);
+      color: #a7f3c8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .builder {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .musicas-grid {
+      display: grid;
+      gap: 8px;
+      max-height: 560px;
+      overflow: auto;
+      padding-right: 4px
+    }
+
+    .music-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px;
+      border-radius: 12px;
+      background: #10151c;
+      border: 1px solid var(--line);
+    }
+
+    .music-row strong {
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .music-row small {
+      color: var(--muted)
+    }
+
+    .playlist-itens {
+      display: grid;
+      gap: 8px
+    }
+
+    .ordem-item {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 13px;
+      background: #10151c;
+      border: 1px solid var(--line);
+    }
+
+    .numero {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(80, 183, 255, .12);
+      color: #bce5ff;
+      font-weight: 900;
+    }
+
+    .timeline {
+      margin-top: 14px;
+      background: #0d1117;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .linha {
+      display: flex;
+      height: 58px;
+      min-width: 680px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .segmento {
+      position: relative;
+      min-width: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      background: linear-gradient(135deg, rgba(80, 183, 255, .84), rgba(31, 212, 123, .78));
+      border-right: 1px solid rgba(0, 0, 0, .2);
+    }
+
+    .segmento:nth-child(2n) {
+      background: linear-gradient(135deg, rgba(243, 200, 75, .86), rgba(255, 77, 103, .74))
+    }
+
+    .segmento span {
+      font-size: 12px;
+      font-weight: 900;
+      color: #061014;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .marcadores {
+      min-width: 680px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .andamento {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .barra {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .09);
+      overflow: hidden;
+    }
+
+    .progresso {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      border-radius: 999px
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      max-width: 420px;
+      background: #10151c;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .35);
+      padding: 14px 16px;
+      display: none;
+    }
+
+    .toast.ativo {
+      display: block
+    }
+
+    .toast strong {
+      display: block;
+      margin-bottom: 3px
+    }
+
+    .toast p {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .vazio {
+      border: 1px dashed rgba(255, 255, 255, .18);
+      border-radius: 14px;
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media(max-width:1050px) {
+
+      .grid,
+      .builder {
+        grid-template-columns: 1fr
+      }
+
+      .metricas {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+    }
+
+    @media(max-width:650px) {
+      body {
+        padding: 12px
+      }
+
+      .topo {
+        align-items: flex-start;
+        flex-direction: column
+      }
+
+      .metricas {
+        grid-template-columns: 1fr
+      }
+
+      .item,
+      .ordem-item {
+        grid-template-columns: 1fr
+      }
+
+      .item-actions {
+        justify-content: flex-start
+      }
+
+      .btn {
+        width: 100%
+      }
+    }
+
+
+
+    .grid aside {
+      height: 100%;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .grid main {
+      height: 100%;
+      overflow: auto;
+    }
+
+    .builder {
+      height: 100%;
+      grid-template-columns: 500px 1fr;
+    }
+
+    .musicas-grid {
+      max-height: none;
+      height: calc(100vh - 420px);
+    }
+
+    .playlist-itens {
+      max-height: none;
+      height: calc(100vh - 420px);
+      overflow: auto;
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
-  <header class="topo">
-    <div class="marca">
-      <div class="marca-selo">OM</div>
-      <div>
-        <h1>OTTO MUSIC</h1>
-        <p>Painel de playlists, empresas e transmissão sincronizada</p>
-      </div>
-    </div>
-    <div class="status-global"><span class="pulso"></span><span id="statusConexao">Conectado</span></div>
-  </header>
-
-  <section class="grid">
-    <aside class="stack">
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <h2>Comando rápido</h2>
-            <p>Escolha uma playlist, uma empresa ou sincronize todas.</p>
-          </div>
+  <div class="container">
+    <header class="topo">
+      <div class="marca">
+        <div>
+          <h1>OTTO MUSIC</h1>
+          <p>Painel de playlists, empresas e transmissão sincronizada</p>
         </div>
-        <div class="card-body stack">
-          <div class="field">
-            <label>Playlist</label>
-            <select id="playlistControle"></select>
-          </div>
-          <div class="field">
-            <label>Destino</label>
-            <select id="empresaControle"></select>
-          </div>
-          <div class="field">
-            <label>Início</label>
-            <input id="inicioControle" type="datetime-local">
-          </div>
-          <div class="row">
-            <button class="btn btn-primary" id="btnIniciar">Iniciar</button>
-            <button class="btn btn-yellow" id="btnPausar">Pausar</button>
-            <button class="btn btn-danger" id="btnParar">Parar</button>
-          </div>
-          <div class="andamento">
-            <div class="row" style="justify-content:space-between">
-              <small id="agoraTexto">Nenhuma transmissão ativa</small>
-              <small id="tempoTexto">00:00 / 00:00</small>
+      </div>
+      <div class="status-global"><span class="pulso"></span><span id="statusConexao">Conectado</span></div>
+    </header>
+
+    <section class="grid">
+      <aside class="stack">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Comando rápido</h2>
+              <p>Escolha uma playlist, uma empresa ou sincronize todas.</p>
             </div>
-            <div class="barra"><div id="progressoAtual" class="progresso"></div></div>
+          </div>
+          <div class="card-body stack">
+            <div class="field">
+              <label>Playlist</label>
+              <select id="playlistControle"></select>
+            </div>
+            <div class="field">
+              <label>Destino</label>
+              <select id="empresaControle"></select>
+            </div>
+            <div class="field">
+              <label>Início</label>
+              <input id="inicioControle" type="datetime-local">
+            </div>
+            <div class="row">
+              <button class="btn btn-primary" id="btnIniciar">Iniciar</button>
+              <button class="btn btn-yellow" id="btnPausar">Pausar</button>
+              <button class="btn btn-danger" id="btnParar">Parar</button>
+            </div>
+            <div class="andamento">
+              <div class="row" style="justify-content:space-between">
+                <small id="agoraTexto">Nenhuma transmissão ativa</small>
+                <small id="tempoTexto">00:00 / 00:00</small>
+              </div>
+              <div class="barra">
+                <div id="progressoAtual" class="progresso"></div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <h2>Upload de música</h2>
-            <p>Envie MP3 para a biblioteca geral.</p>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Upload de música</h2>
+              <p>Envie MP3 para a biblioteca geral.</p>
+            </div>
+          </div>
+          <div class="card-body stack">
+            <input type="file" id="arquivo" accept=".mp3,audio/mpeg">
+            <button class="btn btn-blue" id="btnUpload">Enviar música</button>
           </div>
         </div>
-        <div class="card-body stack">
-          <input type="file" id="arquivo" accept=".mp3,audio/mpeg">
-          <button class="btn btn-blue" id="btnUpload">Enviar música</button>
-        </div>
-      </div>
 
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <h2>Empresas</h2>
-            <p>Cadastre lojas, unidades ou clientes.</p>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Empresas</h2>
+              <p>Cadastre lojas, unidades ou clientes.</p>
+            </div>
+          </div>
+          <div class="card-body stack">
+            <div class="row">
+              <input id="novaEmpresa" placeholder="Nome da empresa">
+              <button class="btn btn-primary" id="btnEmpresa">Adicionar</button>
+            </div>
+            <div id="listaEmpresas" class="lista"></div>
           </div>
         </div>
-        <div class="card-body stack">
-          <div class="row">
-            <input id="novaEmpresa" placeholder="Nome da empresa">
-            <button class="btn btn-primary" id="btnEmpresa">Adicionar</button>
+      </aside>
+
+      <main class="card">
+        <nav class="tabs">
+          <button class="tab ativo" data-view="resumo">Resumo</button>
+          <button class="tab" data-view="playlists">Playlists</button>
+          <button class="tab" data-view="biblioteca">Biblioteca</button>
+          <button class="tab" data-view="timeline">Linha do tempo</button>
+        </nav>
+
+        <section id="view-resumo" class="view ativa card-body">
+          <div class="metricas">
+            <div class="metrica"><span>Músicas</span><strong id="mTotalMusicas">0</strong></div>
+            <div class="metrica"><span>Playlists</span><strong id="mTotalPlaylists">0</strong></div>
+            <div class="metrica"><span>Empresas</span><strong id="mTotalEmpresas">0</strong></div>
+            <div class="metrica"><span>Duração</span><strong id="mDuracao">00:00</strong></div>
           </div>
-          <div id="listaEmpresas" class="lista"></div>
-        </div>
-      </div>
-    </aside>
+          <div class="card" style="box-shadow:none">
+            <div class="card-head">
+              <div>
+                <h2>Playlists salvas</h2>
+                <p>Use uma playlist salva como programação.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="listaPlaylistsResumo" class="lista"></div>
+            </div>
+          </div>
+        </section>
 
-    <main class="card">
-      <nav class="tabs">
-        <button class="tab ativo" data-view="resumo">Resumo</button>
-        <button class="tab" data-view="playlists">Playlists</button>
-        <button class="tab" data-view="biblioteca">Biblioteca</button>
-        <button class="tab" data-view="timeline">Linha do tempo</button>
-      </nav>
-
-      <section id="view-resumo" class="view ativa card-body">
-        <div class="metricas">
-          <div class="metrica"><span>Músicas</span><strong id="mTotalMusicas">0</strong></div>
-          <div class="metrica"><span>Playlists</span><strong id="mTotalPlaylists">0</strong></div>
-          <div class="metrica"><span>Empresas</span><strong id="mTotalEmpresas">0</strong></div>
-          <div class="metrica"><span>Duração</span><strong id="mDuracao">00:00</strong></div>
-        </div>
-        <div class="card" style="box-shadow:none">
-          <div class="card-head"><div><h2>Playlists salvas</h2><p>Use uma playlist salva como programação.</p></div></div>
-          <div class="card-body"><div id="listaPlaylistsResumo" class="lista"></div></div>
-        </div>
-      </section>
-
-      <section id="view-playlists" class="view card-body">
-        <div class="builder">
-          <div class="stack">
-            <div class="card" style="box-shadow:none">
-              <div class="card-head"><div><h2>Montar playlist</h2><p>Defina nome, destino, horário e ordem das músicas.</p></div></div>
-              <div class="card-body stack">
-                <input type="hidden" id="playlistEditando">
-                <div class="field">
-                  <label>Nome da playlist</label>
-                  <input id="nomePlaylist" placeholder="Ex: Manhã Mercatto">
+        <section id="view-playlists" class="view card-body">
+          <div class="builder">
+            <div class="stack">
+              <div class="card" style="box-shadow:none">
+                <div class="card-head">
+                  <div>
+                    <h2>Montar playlist</h2>
+                    <p>Defina nome, destino, horário e ordem das músicas.</p>
+                  </div>
                 </div>
-                <div class="field">
-                  <label>Empresa</label>
-                  <select id="empresaPlaylist"></select>
-                </div>
-                <div class="field">
-                  <label>Hora de início</label>
-                  <input id="inicioPlaylist" type="datetime-local">
-                </div>
-                <label class="row" style="color:var(--muted);font-weight:700">
+                <div class="card-body stack">
+                  <input type="hidden" id="playlistEditando">
+                  <div class="field">
+                    <label>Nome da playlist</label>
+                    <input id="nomePlaylist" placeholder="Ex: Manhã Mercatto">
+                  </div>
+                  <div class="field">
+                    <label>Empresa</label>
+                    <select id="empresaPlaylist"></select>
+                  </div>
+                  <div class="field">
+                    <label>Hora de início</label>
+                    <input id="inicioPlaylist" type="datetime-local">
+                  </div>
+                  <label class="row" style="color:var(--muted);font-weight:700">
                   <input id="syncTodas" type="checkbox" checked style="width:auto;min-height:auto">
                   Sincronizar todas as empresas
                 </label>
-                <div class="row">
-                  <button class="btn btn-primary" id="btnSalvarPlaylist">Salvar playlist</button>
-                  <button class="btn btn-ghost" id="btnNovaPlaylist">Limpar</button>
+                  <div class="row">
+                    <button class="btn btn-primary" id="btnSalvarPlaylist">Salvar playlist</button>
+                    <button class="btn btn-ghost" id="btnNovaPlaylist">Limpar</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card" style="box-shadow:none">
+                <div class="card-head">
+                  <div>
+                    <h2>Biblioteca</h2>
+                    <p>Adicione músicas à ordem da playlist.</p>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <input id="buscaMusica" placeholder="Buscar música">
+                  <div id="musicasParaAdicionar" class="musicas-grid" style="margin-top:12px"></div>
                 </div>
               </div>
             </div>
-            <div class="card" style="box-shadow:none">
-              <div class="card-head"><div><h2>Biblioteca</h2><p>Adicione músicas à ordem da playlist.</p></div></div>
-              <div class="card-body">
-                <input id="buscaMusica" placeholder="Buscar música">
-                <div id="musicasParaAdicionar" class="musicas-grid" style="margin-top:12px"></div>
+            <div class="stack">
+              <div class="card" style="box-shadow:none">
+                <div class="card-head">
+                  <div>
+                    <h2>Ordem da playlist</h2>
+                    <p>Suba, desça ou remova faixas.</p>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div id="ordemPlaylist" class="playlist-itens"></div>
+                  <div id="timelineBuilder" class="timeline"></div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="stack">
-            <div class="card" style="box-shadow:none">
-              <div class="card-head"><div><h2>Ordem da playlist</h2><p>Suba, desça ou remova faixas.</p></div></div>
-              <div class="card-body">
-                <div id="ordemPlaylist" class="playlist-itens"></div>
-                <div id="timelineBuilder" class="timeline"></div>
-              </div>
+        </section>
+
+        <section id="view-biblioteca" class="view card-body">
+          <div class="row" style="justify-content:space-between;margin-bottom:14px">
+            <div>
+              <h2>Biblioteca de músicas</h2>
+              <p>Arquivos enviados para o Supabase Storage.</p>
             </div>
+            <input id="buscaBiblioteca" placeholder="Buscar" style="max-width:320px">
           </div>
-        </div>
-      </section>
+          <div id="listaBiblioteca" class="lista"></div>
+        </section>
 
-      <section id="view-biblioteca" class="view card-body">
-        <div class="row" style="justify-content:space-between;margin-bottom:14px">
-          <div>
-            <h2>Biblioteca de músicas</h2>
-            <p>Arquivos enviados para o Supabase Storage.</p>
+        <section id="view-timeline" class="view card-body">
+          <div class="row" style="justify-content:space-between;margin-bottom:14px">
+            <div>
+              <h2>Linha do tempo</h2>
+              <p>Visualize minutos, sequência e andamento da playlist selecionada.</p>
+            </div>
+            <select id="playlistTimeline" style="max-width:360px"></select>
           </div>
-          <input id="buscaBiblioteca" placeholder="Buscar" style="max-width:320px">
-        </div>
-        <div id="listaBiblioteca" class="lista"></div>
-      </section>
+          <div id="timelineDetalhada" class="timeline"></div>
+        </section>
+      </main>
+    </section>
+  </div>
 
-      <section id="view-timeline" class="view card-body">
-        <div class="row" style="justify-content:space-between;margin-bottom:14px">
-          <div>
-            <h2>Linha do tempo</h2>
-            <p>Visualize minutos, sequência e andamento da playlist selecionada.</p>
-          </div>
-          <select id="playlistTimeline" style="max-width:360px"></select>
-        </div>
-        <div id="timelineDetalhada" class="timeline"></div>
-      </section>
-    </main>
-  </section>
-</div>
+  <div id="toast" class="toast"><strong id="toastTitulo"></strong>
+    <p id="toastTexto"></p>
+  </div>
 
-<div id="toast" class="toast"><strong id="toastTitulo"></strong><p id="toastTexto"></p></div>
-
-<script>
-const SUPABASE_URL = "https://dxkszikemntfusfyrzos.supabase.co";
+  <script>
+    const SUPABASE_URL = "https://dxkszikemntfusfyrzos.supabase.co";
 const SUPABASE_KEY = "sb_publishable_NNFvdfSXgOdGGVcSbphbjQ_brC3_9ed";
 const supabaseClient = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
@@ -660,8 +999,13 @@ function renderBiblioteca(){
     <div class="item">
       <div class="item-info"><strong>${m.nome}</strong><small>${formatoTempo(duracaoMusica(m))}</small></div>
       <div class="item-actions">
-        <button class="btn btn-small btn-blue" onclick="adicionarMusica(${m.id})">Adicionar</button>
-        <a class="btn btn-small btn-ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="${m.url}" target="_blank">Abrir</a>
+<button class="btn btn-small btn-blue"
+onclick="adicionarMusica('${m.id}')">
+Adicionar
+</button>
+
+
+<a class="btn btn-small btn-ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="${m.url}" target="_blank">Abrir</a>
       </div>
     </div>
   `).join("");
@@ -675,8 +1019,10 @@ function renderMusicasAdicionar(){
   lista.innerHTML = filtradas.map(m => `
     <div class="music-row">
       <div><strong>${m.nome}</strong><small>${formatoTempo(duracaoMusica(m))}</small></div>
-      <button class="btn btn-small btn-primary" onclick="adicionarMusica(${m.id})">Adicionar</button>
-    </div>
+<button class="btn btn-small btn-primary"
+onclick="adicionarMusica('${m.id}')">
+Adicionar
+</button>    </div>
   `).join("");
 }
 
@@ -977,6 +1323,7 @@ supabaseClient.channel("admin-radio-sync")
 
 setInterval(atualizarAndamento,1000);
 carregarTudo();
-</script>
+  </script>
 </body>
+
 </html>
