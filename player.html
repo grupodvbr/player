@@ -5,37 +5,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050505">
-
 <title>OTTO MUSIC</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Inter,Arial,sans-serif;
-}
-
-:root{
---bg:#050505;
---panel:#111;
---panel2:#1b1b1b;
---text:#fff;
---muted:rgba(255,255,255,.68);
---line:rgba(255,255,255,.12);
---accent:#f5d76e;
---accent2:#ff4d7d;
---green:#22c55e;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial,sans-serif}
+:root{--text:#fff;--muted:rgba(255,255,255,.68);--line:rgba(255,255,255,.12);--accent:#1fd47b;--blue:#50b7ff;--red:#ff4d67}
 body{
 min-height:100vh;
-background:
-radial-gradient(circle at 20% 12%,rgba(255,77,125,.24),transparent 32%),
-radial-gradient(circle at 82% 20%,rgba(245,215,110,.18),transparent 30%),
-linear-gradient(135deg,#050505,#111 48%,#070707);
+background:radial-gradient(circle at 18% 10%,rgba(80,183,255,.22),transparent 34%),radial-gradient(circle at 86% 12%,rgba(31,212,123,.18),transparent 32%),linear-gradient(135deg,#050505,#10151c 52%,#050505);
 color:var(--text);
 display:flex;
 align-items:center;
@@ -43,304 +20,63 @@ justify-content:center;
 overflow:hidden;
 padding:22px;
 }
-
-body::before{
-content:"";
-position:fixed;
-inset:0;
-background:
-linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
-linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
-background-size:52px 52px;
-mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 85%);
-pointer-events:none;
-}
-
 .player{
-position:relative;
-z-index:1;
 width:min(94vw,860px);
 display:grid;
 grid-template-columns:minmax(260px,360px) 1fr;
 gap:34px;
 align-items:center;
-background:rgba(10,10,10,.76);
+background:rgba(10,12,16,.78);
 border:1px solid var(--line);
 box-shadow:0 30px 90px rgba(0,0,0,.58);
 backdrop-filter:blur(18px);
 border-radius:28px;
 padding:36px;
 }
-
-.album{
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.disco-wrap{
-position:relative;
-width:min(72vw,340px);
-aspect-ratio:1;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.halo{
-position:absolute;
-inset:8%;
-border-radius:50%;
-background:conic-gradient(from 120deg,var(--accent),var(--accent2),#6ee7f5,var(--accent));
-filter:blur(28px);
-opacity:.34;
-animation:pulso 2.4s ease-in-out infinite;
-}
-
-.disco{
-position:relative;
-width:82%;
-height:82%;
-border-radius:50%;
-background:
-radial-gradient(circle at center,#050505 0 9%,#f4f4f4 9.5% 10.8%,#161616 11.5% 25%,transparent 25.5%),
-repeating-radial-gradient(circle,#0b0b0b 0 5px,#1e1e1e 6px 8px),
-conic-gradient(from 35deg,#111,#2a2a2a,#070707,#1a1a1a,#111);
-box-shadow:
-inset 0 0 28px rgba(255,255,255,.08),
-0 24px 60px rgba(0,0,0,.58);
-animation:gira 6s linear infinite;
-}
-
-.disco::after{
-content:"";
-position:absolute;
-inset:18%;
-border-radius:50%;
-background:radial-gradient(circle,var(--accent) 0 33%,#171717 34% 100%);
-border:1px solid rgba(255,255,255,.12);
-}
-
-.pause{
-animation-play-state:paused;
-}
-
-.info{
-min-width:0;
-}
-
-.tag{
-display:inline-flex;
-align-items:center;
-gap:9px;
-padding:8px 12px;
-border:1px solid var(--line);
-border-radius:999px;
-background:rgba(255,255,255,.06);
-color:var(--muted);
-font-size:13px;
-font-weight:700;
-letter-spacing:.04em;
-text-transform:uppercase;
-}
-
-.dot{
-width:9px;
-height:9px;
-border-radius:50%;
-background:var(--green);
-box-shadow:0 0 18px var(--green);
-}
-
-.logo{
-font-size:clamp(42px,8vw,84px);
-line-height:.9;
-font-weight:900;
-margin-top:20px;
-letter-spacing:0;
-}
-
-.nome{
-font-size:clamp(22px,4vw,34px);
-font-weight:800;
-margin-top:18px;
-word-break:break-word;
-}
-
-.status{
-font-size:16px;
-color:var(--muted);
-margin-top:10px;
-min-height:24px;
-}
-
-.barra{
-height:8px;
-background:rgba(255,255,255,.1);
-border-radius:999px;
-overflow:hidden;
-margin-top:26px;
-}
-
-.progresso{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,var(--accent),var(--accent2));
-border-radius:999px;
-transition:width .4s linear;
-}
-
-.acoes{
-display:flex;
-align-items:center;
-gap:12px;
-flex-wrap:wrap;
-margin-top:24px;
-}
-
-button{
-border:0;
-cursor:pointer;
-font-weight:800;
-font-size:15px;
-border-radius:12px;
-min-height:48px;
-padding:0 18px;
-}
-
-.btn-principal{
-background:#fff;
-color:#050505;
-}
-
-.btn-secundario{
-background:rgba(255,255,255,.08);
-color:#fff;
-border:1px solid var(--line);
-}
-
-.bloqueio-audio{
-position:fixed;
-inset:0;
-z-index:99;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:22px;
-background:rgba(0,0,0,.88);
-backdrop-filter:blur(16px);
-}
-
-.modal-audio{
-width:min(92vw,470px);
-text-align:center;
-background:linear-gradient(180deg,#191919,#0d0d0d);
-border:1px solid var(--line);
-border-radius:24px;
-padding:32px;
-box-shadow:0 26px 90px rgba(0,0,0,.7);
-}
-
-.icone-audio{
-width:74px;
-height:74px;
-margin:0 auto 18px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:34px;
-background:linear-gradient(135deg,var(--accent),var(--accent2));
-color:#050505;
-}
-
-.modal-audio h2{
-font-size:26px;
-margin-bottom:10px;
-}
-
-.modal-audio p{
-color:var(--muted);
-line-height:1.5;
-margin-bottom:22px;
-}
-
-.oculto{
-display:none;
-}
-
-@keyframes gira{
-from{transform:rotate(0deg);}
-to{transform:rotate(360deg);}
-}
-
-@keyframes pulso{
-0%,100%{transform:scale(.96);opacity:.26;}
-50%{transform:scale(1.04);opacity:.42;}
-}
-
-@media(max-width:760px){
-body{
-padding:14px;
-align-items:stretch;
-}
-
-.player{
-min-height:calc(100vh - 28px);
-grid-template-columns:1fr;
-gap:18px;
-padding:26px 18px;
-align-content:center;
-border-radius:22px;
-}
-
-.info{
-text-align:center;
-}
-
-.acoes{
-justify-content:center;
-}
-
-button{
-width:100%;
-}
-}
+.disco-wrap{position:relative;width:min(72vw,340px);aspect-ratio:1;display:grid;place-items:center}
+.halo{position:absolute;inset:8%;border-radius:50%;background:conic-gradient(from 120deg,var(--accent),var(--blue),#f3c84b,var(--accent));filter:blur(28px);opacity:.34;animation:pulso 2.4s ease-in-out infinite}
+.disco{position:relative;width:82%;height:82%;border-radius:50%;background:radial-gradient(circle at center,#050505 0 9%,#f4f4f4 9.5% 10.8%,#161616 11.5% 25%,transparent 25.5%),repeating-radial-gradient(circle,#0b0b0b 0 5px,#1e1e1e 6px 8px),conic-gradient(from 35deg,#111,#2a2a2a,#070707,#1a1a1a,#111);box-shadow:inset 0 0 28px rgba(255,255,255,.08),0 24px 60px rgba(0,0,0,.58);animation:gira 6s linear infinite}
+.disco::after{content:"";position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,var(--accent) 0 33%,#171717 34% 100%);border:1px solid rgba(255,255,255,.12)}
+.pause{animation-play-state:paused}
+.tag{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);font-size:13px;font-weight:800;text-transform:uppercase}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+.logo{font-size:clamp(42px,8vw,84px);line-height:.9;font-weight:900;margin-top:20px;letter-spacing:0}
+.empresa{font-size:14px;color:var(--muted);margin-top:12px;font-weight:800;text-transform:uppercase}
+.nome{font-size:clamp(22px,4vw,34px);font-weight:800;margin-top:12px;word-break:break-word}
+.status{font-size:16px;color:var(--muted);margin-top:10px;min-height:24px}
+.barra{height:8px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;margin-top:26px}
+.progresso{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:999px;transition:width .4s linear}
+.tempo{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;font-weight:800;margin-top:8px}
+.bloqueio-audio{position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.88);backdrop-filter:blur(16px)}
+.modal-audio{width:min(92vw,470px);text-align:center;background:linear-gradient(180deg,#191919,#0d0d0d);border:1px solid var(--line);border-radius:24px;padding:32px;box-shadow:0 26px 90px rgba(0,0,0,.7)}
+.modal-audio h2{font-size:26px;margin-bottom:10px}
+.modal-audio p{color:var(--muted);line-height:1.5;margin-bottom:22px}
+button{border:0;cursor:pointer;font-weight:900;font-size:15px;border-radius:12px;min-height:48px;padding:0 18px;background:#fff;color:#050505}
+.oculto{display:none}
+@keyframes gira{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulso{0%,100%{transform:scale(.96);opacity:.26}50%{transform:scale(1.04);opacity:.42}}
+@media(max-width:760px){body{padding:14px;align-items:stretch}.player{min-height:calc(100vh - 28px);grid-template-columns:1fr;gap:18px;padding:26px 18px;align-content:center;text-align:center}.disco-wrap{margin:auto}}
 </style>
 </head>
 <body>
-
 <main class="player">
-  <section class="album" aria-label="Capa do player">
-    <div class="disco-wrap">
-      <div class="halo"></div>
-      <div id="disco" class="disco pause"></div>
-    </div>
-  </section>
-
-  <section class="info">
-    <div class="tag"><span id="dot" class="dot"></span><span id="tagText">Conectando</span></div>
+  <section><div class="disco-wrap"><div class="halo"></div><div id="disco" class="disco pause"></div></div></section>
+  <section>
+    <div class="tag"><span id="dot" class="dot"></span><span id="tagText">Ao vivo</span></div>
     <h1 class="logo">OTTO<br>MUSIC</h1>
+    <div id="empresaNome" class="empresa">Todas as empresas</div>
     <div id="nome" class="nome">Aguardando...</div>
-    <div id="status" class="status">Conectando ao servidor...</div>
-
-    <div class="barra" aria-hidden="true">
-      <div id="progresso" class="progresso"></div>
-    </div>
-
-    <div class="acoes">
-      <button id="botaoLiberarInline" class="btn-principal oculto" type="button">Liberar áudio</button>
-      <button id="botaoAtualizar" class="btn-secundario" type="button">Atualizar</button>
-    </div>
+    <div id="status" class="status">Buscando transmissão...</div>
+    <div class="barra"><div id="progresso" class="progresso"></div></div>
+    <div class="tempo"><span id="tempoAtual">00:00</span><span id="tempoTotal">00:00</span></div>
   </section>
 </main>
 
 <div id="bloqueioAudio" class="bloqueio-audio oculto">
   <div class="modal-audio">
-    <div class="icone-audio">▶</div>
     <h2>Liberar áudio</h2>
-    <p>Este dispositivo bloqueou a reprodução automática. Toque no botão abaixo para permitir que a rádio comece a tocar.</p>
-    <button id="liberarAudio" class="btn-principal" type="button">Liberar e tocar agora</button>
+    <p>Este dispositivo bloqueou a reprodução automática. Toque no botão para permitir a transmissão.</p>
+    <button id="liberarAudio" type="button">Liberar e tocar</button>
   </div>
 </div>
 
@@ -349,7 +85,6 @@ width:100%;
 <script>
 const SUPABASE_URL = "https://dxkszikemntfusfyrzos.supabase.co";
 const SUPABASE_KEY = "sb_publishable_NNFvdfSXgOdGGVcSbphbjQ_brC3_9ed";
-
 const supabaseClient = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const audio = document.getElementById("audio");
@@ -359,221 +94,182 @@ const disco = document.getElementById("disco");
 const progresso = document.getElementById("progresso");
 const bloqueioAudio = document.getElementById("bloqueioAudio");
 const liberarAudio = document.getElementById("liberarAudio");
-const botaoLiberarInline = document.getElementById("botaoLiberarInline");
-const botaoAtualizar = document.getElementById("botaoAtualizar");
 const tagText = document.getElementById("tagText");
 const dot = document.getElementById("dot");
+const empresaNome = document.getElementById("empresaNome");
+const tempoAtual = document.getElementById("tempoAtual");
+const tempoTotal = document.getElementById("tempoTotal");
 
-let musicaAtual = null;
+const params = new URLSearchParams(location.search);
+const empresaId = params.get("empresa");
+const estadoId = empresaId ? 1000 + Number(empresaId) : 1;
+
 let estadoAtual = null;
-let usuarioLiberouAudio = false;
+let itensPlaylist = [];
+let musicaAtualUrl = null;
 let tentativaEmAndamento = false;
+let timerProgramado = null;
 
-function textoStatus(texto){
-statusTxt.textContent = texto;
+function formatoTempo(segundos){
+  segundos = Math.max(0,Math.floor(Number(segundos) || 0));
+  const m = Math.floor(segundos / 60);
+  const s = segundos % 60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 }
 
-function modoConectando(){
-tagText.textContent = "Conectando";
-dot.style.background = "#f5d76e";
-dot.style.boxShadow = "0 0 18px #f5d76e";
+function duracao(musica){ return Number(musica?.duracao_segundos) || 180; }
+function setStatus(texto){ statusTxt.textContent = texto; }
+function setTag(texto,cor){ tagText.textContent = texto; dot.style.background = cor; dot.style.boxShadow = `0 0 18px ${cor}`; }
+function mostrarLiberacao(){ bloqueioAudio.classList.remove("oculto"); setStatus("Toque em Liberar áudio para ouvir."); disco.classList.add("pause"); }
+function esconderLiberacao(){ bloqueioAudio.classList.add("oculto"); }
+
+async function tocar(){
+  if(tentativaEmAndamento) return;
+  tentativaEmAndamento = true;
+  try{
+    await audio.play();
+    esconderLiberacao();
+    disco.classList.remove("pause");
+    setTag("Ao vivo","#1fd47b");
+  }catch(e){
+    mostrarLiberacao();
+  }finally{
+    tentativaEmAndamento = false;
+  }
 }
 
-function modoAoVivo(){
-tagText.textContent = "Ao vivo";
-dot.style.background = "#22c55e";
-dot.style.boxShadow = "0 0 18px #22c55e";
+function pausar(texto){
+  audio.pause();
+  disco.classList.add("pause");
+  setStatus(texto || "Pausado");
 }
 
-function modoPausado(){
-tagText.textContent = "Pausado";
-dot.style.background = "#94a3b8";
-dot.style.boxShadow = "0 0 18px #94a3b8";
+async function carregarEmpresa(){
+  if(!empresaId){ empresaNome.textContent = "Todas as empresas"; return; }
+  const { data } = await supabaseClient.from("empresas").select("nome").eq("id",empresaId).maybeSingle();
+  empresaNome.textContent = data?.nome || `Empresa ${empresaId}`;
 }
 
-function mostrarLiberacaoAudio(){
-bloqueioAudio.classList.remove("oculto");
-botaoLiberarInline.classList.remove("oculto");
-textoStatus("Toque em Liberar áudio para ouvir neste dispositivo.");
-disco.classList.add("pause");
+async function carregarEstado(){
+  clearTimeout(timerProgramado);
+  let { data } = await supabaseClient.from("player_estado").select("*").eq("id",estadoId).maybeSingle();
+  if(!data && empresaId){
+    const geral = await supabaseClient.from("player_estado").select("*").eq("id",1).maybeSingle();
+    data = geral.data;
+  }
+  estadoAtual = data || null;
+
+  if(!estadoAtual){
+    nome.textContent = "Aguardando programação";
+    setStatus("Sem transmissão ativa.");
+    setTag("Aguardando","#94a3b8");
+    pausar("Sem transmissão ativa.");
+    return;
+  }
+
+  if(estadoAtual.playlist_id){
+    const itens = await supabaseClient
+      .from("playlist_itens")
+      .select("*, playlist_musicas(*)")
+      .eq("playlist_id",estadoAtual.playlist_id)
+      .order("ordem",{ascending:true});
+    itensPlaylist = itens.data || [];
+  }else{
+    itensPlaylist = [];
+  }
+
+  aplicarEstado();
 }
 
-function esconderLiberacaoAudio(){
-bloqueioAudio.classList.add("oculto");
-botaoLiberarInline.classList.add("oculto");
+async function aplicarEstado(){
+  if(!estadoAtual) return;
+  if(estadoAtual.status !== "playing"){
+    setTag(estadoAtual.status === "pause" ? "Pausado" : "Parado","#94a3b8");
+    pausar(estadoAtual.status === "pause" ? "Pausado" : "Transmissão parada.");
+    return;
+  }
+
+  const inicioMs = new Date(estadoAtual.inicio).getTime();
+  const agoraMs = Date.now();
+  if(inicioMs > agoraMs){
+    const falta = Math.ceil((inicioMs - agoraMs) / 1000);
+    setTag("Programado","#f3c84b");
+    nome.textContent = "Início programado";
+    pausar(`Começa em ${formatoTempo(falta)}.`);
+    timerProgramado = setTimeout(carregarEstado,Math.min(falta * 1000,30000));
+    return;
+  }
+
+  let musica = null;
+  let posicaoFaixa = 0;
+  let posicaoTotal = 0;
+  let total = 0;
+
+  if(itensPlaylist.length){
+    total = itensPlaylist.reduce((s,item) => s + duracao(item.playlist_musicas),0);
+    posicaoTotal = total ? Math.floor((agoraMs - inicioMs) / 1000) % total : 0;
+    let acumulado = 0;
+    for(const item of itensPlaylist){
+      const d = duracao(item.playlist_musicas);
+      if(posicaoTotal < acumulado + d){
+        musica = item.playlist_musicas;
+        posicaoFaixa = posicaoTotal - acumulado;
+        break;
+      }
+      acumulado += d;
+    }
+  }else if(estadoAtual.musica_id){
+    const { data } = await supabaseClient.from("playlist_musicas").select("*").eq("id",estadoAtual.musica_id).maybeSingle();
+    musica = data;
+    posicaoFaixa = Math.max(0,Math.floor((agoraMs - inicioMs) / 1000));
+    total = duracao(musica);
+    posicaoTotal = posicaoFaixa;
+  }
+
+  if(!musica){
+    nome.textContent = "Nenhuma música encontrada";
+    pausar("Aguardando música.");
+    return;
+  }
+
+  nome.textContent = musica.nome || "Música sem nome";
+  setStatus("Transmitindo ao vivo");
+  setTag("Ao vivo","#1fd47b");
+
+  if(musicaAtualUrl !== musica.url){
+    musicaAtualUrl = musica.url;
+    audio.src = musica.url;
+    audio.onloadedmetadata = () => {
+      if(Number.isFinite(audio.duration)){
+        audio.currentTime = Math.min(posicaoFaixa,Math.max(0,audio.duration - 1));
+      }
+      tocar();
+    };
+  }else if(Number.isFinite(audio.duration) && Math.abs(audio.currentTime - posicaoFaixa) > 3){
+    audio.currentTime = Math.min(posicaoFaixa,Math.max(0,audio.duration - 1));
+    tocar();
+  }else{
+    tocar();
+  }
+
+  const percentual = total ? Math.min(100,(posicaoTotal / total) * 100) : 0;
+  progresso.style.width = `${percentual}%`;
+  tempoAtual.textContent = formatoTempo(posicaoTotal);
+  tempoTotal.textContent = formatoTempo(total);
 }
 
-async function tocarAudio(){
-if(tentativaEmAndamento) return;
-tentativaEmAndamento = true;
+liberarAudio.addEventListener("click",tocar);
+document.addEventListener("visibilitychange",() => { if(!document.hidden) carregarEstado(); });
 
-try{
-await audio.play();
-usuarioLiberouAudio = true;
-esconderLiberacaoAudio();
-modoAoVivo();
-textoStatus("Transmitindo ao vivo");
-disco.classList.remove("pause");
-}catch(error){
-mostrarLiberacaoAudio();
-}finally{
-tentativaEmAndamento = false;
-}
-}
-
-function pausarAudio(){
-audio.pause();
-modoPausado();
-textoStatus("Pausado");
-disco.classList.add("pause");
-}
-
-function atualizarProgresso(){
-if(!estadoAtual || !estadoAtual.inicio){
-progresso.style.width = "0%";
-return;
-}
-
-const inicio = new Date(estadoAtual.inicio).getTime();
-const agora = Date.now();
-const segundos = Math.max(0,Math.floor((agora - inicio) / 1000));
-const duracao = Number.isFinite(audio.duration) ? audio.duration : 0;
-
-if(duracao > 0){
-const porcentagem = Math.min(100,(segundos / duracao) * 100);
-progresso.style.width = porcentagem + "%";
-}
-}
-
-async function sincronizar(){
-if(!estadoAtual){
-modoConectando();
-}
-
-const { data, error } = await supabaseClient
-.from("player_estado")
-.select(`
-  *,
-  playlist_musicas (
-    id,
-    nome,
-    url
-  )
-`)
-.eq("id",1)
-.single();
-
-if(error || !data){
-textoStatus("Não foi possível conectar agora. Tentando novamente...");
-return;
-}
-
-if(!data.musica_id || !data.playlist_musicas){
-nome.textContent = "Nenhuma música selecionada";
-textoStatus("Aguardando transmissão...");
-modoPausado();
-return;
-}
-
-estadoAtual = data;
-
-const musica = data.playlist_musicas;
-const inicio = new Date(data.inicio).getTime();
-const segundos = Math.max(0,Math.floor((Date.now() - inicio) / 1000));
-
-nome.textContent = musica.nome || "Música sem nome";
-
-if(musicaAtual !== musica.url){
-musicaAtual = musica.url;
-audio.src = musica.url;
-
-audio.onloadedmetadata = function(){
-if(Number.isFinite(audio.duration) && segundos < audio.duration){
-audio.currentTime = segundos;
-}
-
-if(data.status === "playing"){
-tocarAudio();
-}else{
-pausarAudio();
-}
-};
-
-audio.onerror = function(){
-textoStatus("Erro ao carregar o áudio.");
-disco.classList.add("pause");
-};
-}else if(Number.isFinite(audio.duration) && Math.abs(audio.currentTime - segundos) > 3){
-audio.currentTime = Math.min(segundos,audio.duration - 1);
-}
-
-if(data.status === "playing"){
-modoAoVivo();
-textoStatus("Transmitindo ao vivo");
-tocarAudio();
-}else{
-pausarAudio();
-}
-
-atualizarProgresso();
-}
-
-liberarAudio.addEventListener("click",function(){
-usuarioLiberouAudio = true;
-tocarAudio();
-});
-
-botaoLiberarInline.addEventListener("click",function(){
-usuarioLiberouAudio = true;
-tocarAudio();
-});
-
-botaoAtualizar.addEventListener("click",function(){
-sincronizar();
-});
-
-audio.addEventListener("playing",function(){
-if(estadoAtual && estadoAtual.status === "playing"){
-usuarioLiberouAudio = true;
-esconderLiberacaoAudio();
-modoAoVivo();
-textoStatus("Transmitindo ao vivo");
-disco.classList.remove("pause");
-}
-});
-
-audio.addEventListener("pause",function(){
-if(estadoAtual && estadoAtual.status !== "playing"){
-disco.classList.add("pause");
-}
-});
-
-document.addEventListener("visibilitychange",function(){
-if(!document.hidden){
-sincronizar();
-}
-});
-
-supabaseClient
-.channel("radio-sync")
-.on(
-"postgres_changes",
-{
-event:"*",
-schema:"public",
-table:"player_estado"
-},
-function(){
-sincronizar();
-}
-)
+supabaseClient.channel("radio-sync-player")
+.on("postgres_changes",{event:"*",schema:"public",table:"player_estado"},carregarEstado)
+.on("postgres_changes",{event:"*",schema:"public",table:"playlist_itens"},carregarEstado)
 .subscribe();
 
-setInterval(sincronizar,10000);
-setInterval(atualizarProgresso,1000);
-
-sincronizar();
+setInterval(aplicarEstado,1000);
+setInterval(carregarEstado,15000);
+carregarEmpresa();
+carregarEstado();
 </script>
-
 </body>
 </html>
