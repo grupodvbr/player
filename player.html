@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Rádio Mercatto</title>
+<title>OTTO MUSIC</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -77,7 +77,7 @@ to{transform:rotate(360deg);}
 <div class="player">
 
 <div class="logo">
-🎵 Rádio Mercatto
+OTTO MUSIC
 </div>
 
 <div id="disco" class="disco"></div>
@@ -133,19 +133,27 @@ SINCRONIZAR
 
 async function sincronizar(){
 
-const { data } =
+const { data, error } =
 await supabaseClient
-.from("player_global")
-.select("*")
-.eq("status","playing")
-.order("updated_at",{ascending:false})
-.limit(1)
+.from("player_estado")
+.select(`
+  *,
+  playlist_musicas (
+    id,
+    nome,
+    url
+  )
+`)
+.eq("id",1)
 .single();
+
+if(error || !data) return;
+if(!data.musica_id) return;
 
 if(!data) return;
 
 nome.innerHTML =
-data.musica;
+data.playlist_musicas.nome;
 
 const inicio =
 new Date(data.inicio).getTime();
@@ -157,26 +165,34 @@ const segundos =
 Math.floor(
 (agora - inicio) / 1000
 );
-
+const tempo =
+Math.max(0, segundos);
 if(
-musicaAtual !== data.url
+musicaAtual !== data.playlist_musicas.url
 ){
 
-musicaAtual = data.url;
+musicaAtual =
+data.playlist_musicas.url;
 
-audio.src = data.url;
+audio.src =
+data.playlist_musicas.url;
 
-audio.addEventListener(
-'loadedmetadata',
-()=>{
+audio.onloadedmetadata = ()=>{
 
-audio.currentTime =
-segundos;
+audio.currentTime = segundos;
+
+if(data.status === "playing"){
 
 audio.play()
 .catch(()=>{});
 
-});
+}else{
+
+audio.pause();
+
+}
+
+};
 
 }
 
@@ -214,7 +230,7 @@ supabaseClient
 {
 event:"*",
 schema:"public",
-table:"player_global"
+table:"player_estado"
 },
 ()=>{
 sincronizar();
