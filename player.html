@@ -70,6 +70,52 @@ from{transform:rotate(0deg);}
 to{transform:rotate(360deg);}
 }
 
+
+#unlockAudio{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999999;
+}
+
+.boxUnlock{
+text-align:center;
+}
+
+.boxUnlock h2{
+font-size:32px;
+margin-bottom:10px;
+}
+
+.boxUnlock p{
+opacity:.8;
+margin-bottom:20px;
+}
+
+.boxUnlock button{
+border:none;
+background:#00c853;
+color:#fff;
+padding:18px 35px;
+font-size:20px;
+font-weight:700;
+border-radius:15px;
+cursor:pointer;
+}
+
+
+
+
+
+
+
+
+
+
+ 
 </style>
 </head>
 <body>
@@ -126,7 +172,34 @@ const disco =
 document.getElementById("disco");
 
 let musicaAtual = null;
+let audioLiberado = false;
 
+async function liberarAudio(){
+
+try{
+
+audio.volume = 0;
+
+audio.src =
+"data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAA";
+
+await audio.play();
+
+audio.pause();
+
+audio.volume = 1;
+
+audioLiberado = true;
+
+}catch(e){}
+
+document
+.getElementById("unlockAudio")
+.style.display = "none";
+
+sincronizar();
+
+}
 /* ==========================
 SINCRONIZAR
 ========================== */
@@ -183,7 +256,9 @@ audio.currentTime = segundos;
 
 if(data.status === "playing"){
 
-audio.play()
+if(audioLiberado){
+  audio.play().catch(()=>{});
+}
 .catch(()=>{});
 
 }else{
@@ -203,7 +278,9 @@ statusTxt.innerHTML =
 
 disco.classList.remove("pause");
 
-audio.play()
+if(audioLiberado){
+  audio.play().catch(()=>{});
+}
 .catch(()=>{});
 
 }else{
@@ -250,6 +327,14 @@ sincronizar,
 sincronizar();
 
 </script>
-
+<div id="unlockAudio">
+  <div class="boxUnlock">
+    <h2>🎵 OTTO MUSIC</h2>
+    <p>Toque para liberar o áudio</p>
+    <button onclick="liberarAudio()">
+      ▶ INICIAR
+    </button>
+  </div>
+</div>
 </body>
 </html>
